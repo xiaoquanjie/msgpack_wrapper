@@ -1,0 +1,4 @@
+﻿  test_main.cpp
+e:\socket\msgpack_wrapper\test_main.cpp(102): warning C4101: “st”: 未引用的局部变量
+  msgpack_wrapper.vcxproj -> E:\socket\msgpack_wrapper\Debug\msgpack_wrapper.exe
+  msgpack_wrapper.vcxproj -> E:\socket\msgpack_wrapper\Debug\msgpack_wrapper.pdb (Full PDB)

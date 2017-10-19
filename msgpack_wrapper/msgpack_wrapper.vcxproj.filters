@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="msgpack">
+      <UniqueIdentifier>{fadea8b8-d6f6-4ff0-84ed-2e4151a0968d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="msgpack\msgpack">
+      <UniqueIdentifier>{fa2ee56d-6585-4b8c-9d0f-5a0f59b0424f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\msgpack\object.cpp">
+      <Filter>msgpack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\msgpack\objectc.cpp">
+      <Filter>msgpack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\msgpack\unpack.cpp">
+      <Filter>msgpack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\msgpack\version.cpp">
+      <Filter>msgpack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\msgpack\vrefbuffer.cpp">
+      <Filter>msgpack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\msgpack\zone.cpp">
+      <Filter>msgpack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test_main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\msgpack\msgpack.h">
+      <Filter>msgpack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\msgpack\msgpack.hpp">
+      <Filter>msgpack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\msgpack\msgpack_wrapper.hpp">
+      <Filter>msgpack</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
