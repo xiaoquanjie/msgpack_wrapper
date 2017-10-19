@@ -27,71 +27,59 @@ struct Stru_Test
 
 	void Write(msgpack::sbuffer& aoBuffer)
 	{
-		OMsgPackObject opObject(aoBuffer);
-		OObject tmp = opObject.Object();// .Write(2);
-		tmp.Write(2);
+		// 单个value值
+		OMsgPackObject(aoBuffer).Object().Write("xiaoquanjie");
+		OMsgPackObject(aoBuffer).Object().Write("nihaoma");
 
+		// 数组
 		OMsgPackArrayObject array_object(aoBuffer, 3);
-		array_object.Object().Write(1);
-		array_object.Object().Write(2);
+		array_object.Object().Write("wo");
+		array_object.Object().Write("ai");
+		array_object.Object().Write("ni");
 
-		OArrayObject arrobject(array_object.Object(), 3);
-		arrobject.Object().Write(44);
-		arrobject.Object().Write(55);
-		//arrobject.Object().Write(66);
-		
-		OMapObject mapobject(arrobject.Object(), 1);
-		OKVObject okvobject = mapobject.Object();
-		okvobject.ObjectKey().Write(100);
-		okvobject.ObjectVal().Write(110);
-		
-		OMsgPackMapObject pakmapobject(aoBuffer, 2);
-		okvobject = pakmapobject.Object();
-		okvobject.ObjectKey().Write(std::string("xiao"));
-		okvobject.ObjectVal().Write(std::string("xiao"));
-		okvobject = pakmapobject.Object();
-		okvobject.ObjectKey().Write(std::string("xiao"));
-		
-		OMapObject omapobject(okvobject.ObjectVal(),1);
-		okvobject = omapobject.Object();
-		okvobject.ObjectKey().Write(200);
-		//okvobject.ObjectKey().Write(300);
-		okvobject.ObjectVal().Write(200);
+		// kv值
+		OMsgPackMapObject map_object(aoBuffer, 1);
+		OKVObject okv = map_object.Object();
+		okv.ObjectKey().Write(1);
+		okv.ObjectVal().Write("woaini");
+
 	}
 
 	void Read(msgpack::sbuffer& aoBuffer)
 	{
-		return ;
-
 		msgpack::unpacker aoUnpak;
 		aoUnpak.reserve_buffer(aoBuffer.size());
 		memcpy(aoUnpak.buffer(), aoBuffer.data(), aoBuffer.size());
 		aoUnpak.buffer_consumed(aoBuffer.size());
 
 		cout << "~~~~~~~~~~~~~~~" << endl;
-		IMsgPackObject iObject(aoUnpak);
-		int i = 0;
-		iObject.Object().Read(i);
-		cout << i << endl;
 
+		// 单个值
+		std::string value;
+		IMsgPackObject(aoUnpak).Object().Read(value);
+		cout << value << endl;
+		IMsgPackObject(aoUnpak).Object().Read(value);
+		cout << value << endl;
+		
+		// 数组
 		IMsgPackArrayObject array_object(aoUnpak);
-		int j = 0;
-		array_object.Object().Read(j);
-		cout << j << endl;
-		array_object.Object().Read(j);
-		cout << j << endl;
+		for (int i = 0; i < array_object.Size(); ++i)
+		{
+			array_object.Object().Read(value);
+			cout << value << endl;
+		}
 
-		IObject object = array_object.Object();
-		IArrayObject aobject(object);
-		aobject.Object().Read(j);
-		cout << j << endl;
-		aobject.Object().Read(j);
-		cout << j << endl;
-		aobject.Object().Read(j);
-		cout << j << endl;
-
-		IMapObject mapobject(array_object.Object());
-		mapobject.Object().ObjectKey().Read(j);
+		// kv值
+		IMsgPackMapObject map_object(aoUnpak);
+		for (int i = 0; i < map_object.Size(); ++i)
+		{
+			IKVObject object = map_object.Object();
+			int k;
+			std::string v;
+			object.ObjectKey().Read(k);
+			object.ObjectVal().Read(v);
+			cout << k << " " << v << endl;
+		}
 	}
 };
 

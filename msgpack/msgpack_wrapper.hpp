@@ -52,6 +52,13 @@ namespace MsgpackWrapper {
 			msgpack::pack(_s, v);
 		}
 
+		template<int N>
+		void Write(const char (&v)[N])
+		{
+			assert(--_size >= 0);
+			msgpack::pack(_s, std::string(v));
+		}
+
 		OObject& operator=(const OObject& o)
 		{
 			_s = o._s;
@@ -419,6 +426,11 @@ namespace MsgpackWrapper {
 				throw msgpack::type_error();
 		}
 
+		size_t Size()const
+		{
+			return _unpaked.get().via.array.size;
+		}
+
 		IObject Object()
 		{
 			if (_index >= _unpaked.get().via.array.size)
@@ -446,6 +458,11 @@ namespace MsgpackWrapper {
 		{
 			if (_unpaked.get().type != msgpack::type::MAP)
 				throw msgpack::type_error();
+		}
+
+		size_t Size()const
+		{
+			return _unpaked.get().via.map.size;
 		}
 
 		IKVObject Object()
