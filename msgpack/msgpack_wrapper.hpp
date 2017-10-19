@@ -481,6 +481,30 @@ namespace MsgpackWrapper {
 		size_t _index;
 	};
 
+	// 
+	class MsgUnpacker
+	{
+	public:
+		MsgUnpacker(msgpack::sbuffer& buffer)
+		{
+			_unpacker.reserve_buffer(buffer.size());
+			memcpy(_unpacker.buffer(), buffer.data(), buffer.size());
+			_unpacker.buffer_consumed(buffer.size());
+		}
+
+		msgpack::unpacker& unpacker()
+		{
+			return _unpacker;
+		}
+
+		operator msgpack::unpacker&()
+		{
+			return _unpacker;
+		}
+
+	private:
+		msgpack::unpacker _unpacker;
+	};
 }
 
 #define mpw MsgpackWrapper

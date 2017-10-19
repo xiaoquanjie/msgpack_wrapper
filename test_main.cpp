@@ -47,11 +47,7 @@ struct Stru_Test
 
 	void Read(msgpack::sbuffer& aoBuffer)
 	{
-		msgpack::unpacker aoUnpak;
-		aoUnpak.reserve_buffer(aoBuffer.size());
-		memcpy(aoUnpak.buffer(), aoBuffer.data(), aoBuffer.size());
-		aoUnpak.buffer_consumed(aoBuffer.size());
-
+		MsgUnpacker aoUnpak(aoBuffer);
 		cout << "~~~~~~~~~~~~~~~" << endl;
 
 		// µ¥¸öÖµ
