@@ -1,0 +1,11 @@
+﻿  zone.cpp
+  vrefbuffer.cpp
+  version.cpp
+e:\socket\msgpack_wrapper\msgpack\msgpack\pack_template.h(746): warning C4267: “参数”: 从“size_t”转换到“unsigned int”，可能丢失数据
+  unpack.cpp
+  objectc.cpp
+e:\socket\msgpack_wrapper\msgpack\msgpack\pack_template.h(746): warning C4267: “参数”: 从“size_t”转换到“unsigned int”，可能丢失数据
+  object.cpp
+  test_main.cpp
+e:\socket\msgpack_wrapper\test_main.cpp(2): fatal error C1083: 无法打开包括文件: “msgpack_wrapper.hpp”: No such file or directory
+  正在生成代码...

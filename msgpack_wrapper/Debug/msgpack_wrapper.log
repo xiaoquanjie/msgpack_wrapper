@@ -1,4 +1,4 @@
 ﻿  test_main.cpp
-e:\socket\msgpack_wrapper\test_main.cpp(102): warning C4101: “st”: 未引用的局部变量
+e:\socket\msgpack_wrapper\test_main.cpp(60): warning C4018: “<”: 有符号/无符号不匹配
   msgpack_wrapper.vcxproj -> E:\socket\msgpack_wrapper\Debug\msgpack_wrapper.exe
   msgpack_wrapper.vcxproj -> E:\socket\msgpack_wrapper\Debug\msgpack_wrapper.pdb (Full PDB)
