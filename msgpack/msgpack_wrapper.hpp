@@ -12,8 +12,6 @@
 namespace MsgpackWrapper {
 
 	class OObject;
-	class OArrayObject;
-	class OMapObject;
 	class OKVObject;
 
 	class OMsgPackObject;
@@ -21,23 +19,18 @@ namespace MsgpackWrapper {
 	class OMsgPackMapObject;
 
 	class IObject;
-	class IArrayObject;
-	class IMapObject;
 	class IKVObject;
 
 	class IMsgPackObject;
 	class IMsgPackArrayObject;
 	class IMsgPackMapObject;
-
+	
 	typedef msgpack::sbuffer sbuffer; // 缓冲区
 
 	//////////////////////////////////////////////////////////////////////////序列化相关数据结构////////////////////////////////////////////////////////
 
 	class OObject
 	{
-		friend OArrayObject;
-		friend OMapObject;
-
 	public:
 		inline OObject(msgpack::sbuffer& s) :_s(s), _size(1) {
 		}
@@ -70,35 +63,6 @@ namespace MsgpackWrapper {
 		msgpack::sbuffer& _s;
 	};
 
-	class OArrayObject
-	{
-	public:
-		OArrayObject(const OObject& o, int n) :_s(o._s), _size(n)
-		{
-			msgpack::packer<msgpack::sbuffer>(_s).pack_array(n);
-		}
-
-		OArrayObject(const OArrayObject& o) : _s(o._s), _size(o._size) {
-		}
-
-		inline OArrayObject& operator=(const OArrayObject& o)
-		{
-			_size = o._size;
-			_s = o._s;
-			return *this;
-		}
-
-		OObject Object()
-		{
-			assert(--_size >= 0);
-			return OObject(_s);
-		}
-
-	protected:
-		int _size;
-		msgpack::sbuffer& _s;
-	};
-
 	class OKVObject
 	{
 	public:
@@ -116,13 +80,13 @@ namespace MsgpackWrapper {
 			return *this;
 		}
 
-		OObject ObjectKey()
+		OObject KeyObject()
 		{
 			assert(--_size1 >= 0);
 			return OObject(_s);
 		}
 
-		OObject ObjectVal()
+		OObject ValObject()
 		{
 			assert(--_size2 >= 0);
 			return OObject(_s);
@@ -131,35 +95,6 @@ namespace MsgpackWrapper {
 	protected:
 		int _size1;
 		int _size2;
-		msgpack::sbuffer& _s;
-	};
-
-	class OMapObject
-	{
-	public:
-		OMapObject(const OObject& o, size_t n) :_s(o._s), _size(n)
-		{
-			msgpack::packer<msgpack::sbuffer>(_s).pack_map(n);
-		}
-
-		OMapObject(const OMapObject& o) : _s(o._s), _size(o._size) {
-		}
-
-		OKVObject Object()
-		{
-			assert(--_size >= 0);
-			return OKVObject(_s);
-		}
-
-		inline OMapObject& operator=(const OMapObject& o)
-		{
-			_size = o._size;
-			_s = o._s;
-			return *this;
-		}
-
-	protected:
-		int _size;
 		msgpack::sbuffer& _s;
 	};
 
@@ -174,6 +109,20 @@ namespace MsgpackWrapper {
 		OObject Object()
 		{
 			return OObject(_s);
+		}
+
+		template<typename T>
+		OMsgPackObject& WriteObject(T const& v)
+		{
+			Object().Write(v);
+			return *this;
+		}
+
+		template<int N>
+		OMsgPackObject& WriteObject(const char(&v)[N])
+		{
+			Object().Write(v);
+			return *this;
 		}
 
 	protected:
@@ -199,6 +148,20 @@ namespace MsgpackWrapper {
 			return OMsgPackObject::Object();
 		}
 
+		template<typename T>
+		OMsgPackArrayObject& WriteObject(T const& v)
+		{
+			Object().Write(v);
+			return *this;
+		}
+
+		template<int N>
+		OMsgPackArrayObject& WriteObject(const char(&v)[N])
+		{
+			Object().Write(v);
+			return *this;
+		}
+
 	protected:
 		int _size;
 	};
@@ -218,6 +181,42 @@ namespace MsgpackWrapper {
 			return OKVObject(_s);
 		}
 
+		template<typename T1,typename T2>
+		OMsgPackMapObject& WriteObject(T1 const& k,T2 const& v)
+		{
+			OKVObject obj = Object();
+			obj.KeyObject().Write(k);
+			obj.ValObject().Write(v);
+			return *this;
+		}
+
+		template<typename T,int N>
+		OMsgPackMapObject& WriteObject(T const& k,const char(&v)[N])
+		{
+			OKVObject obj = Object();
+			obj.KeyObject().Write(k);
+			obj.ValObject().Write(v);
+			return *this;
+		}
+
+		template<typename T, int N>
+		OMsgPackMapObject& WriteObject(const char(&k)[N], T const& v)
+		{
+			OKVObject obj = Object();
+			obj.KeyObject().Write(k);
+			obj.ValObject().Write(v);
+			return *this;
+		}
+
+		template<int N1, int N2>
+		OMsgPackMapObject& WriteObject(const char(&k)[N1], const char(&v)[N2])
+		{
+			OKVObject obj = Object();
+			obj.KeyObject().Write(k);
+			obj.ValObject().Write(v);
+			return *this;
+		}
+
 	protected:
 		int _size;
 	};
@@ -226,11 +225,6 @@ namespace MsgpackWrapper {
 
 	class IObject
 	{
-		friend IArrayObject;
-		friend IMapObject;
-
-		typedef IObject MySelf;
-
 	public:
 		IObject(msgpack::object* pobj) :_pobj(pobj) {}
 
@@ -274,43 +268,6 @@ namespace MsgpackWrapper {
 		msgpack::object* _pobj;
 	};
 
-	class IArrayObject
-	{
-		typedef IObject			Base;
-		typedef IArrayObject	MySelf;
-
-	public:
-		IArrayObject(const IObject& b) : _pobj(b._pobj), _index(0) {}
-
-		IArrayObject(const MySelf& o) :_pobj(o._pobj), _index(o._index) {}
-
-		IArrayObject& operator=(const IArrayObject& o)
-		{
-			_pobj = o._pobj;
-			_index = o._index;
-			return *this;
-		}
-
-		IObject Object()
-		{
-			if (!_pobj)
-				throw msgpack::type_error();
-
-			if (_index >= _pobj->via.array.size)
-			{
-				return IObject(0);
-			}
-			else
-			{
-				return IObject(_pobj->via.array.ptr + _index++);
-			}
-		}
-
-	protected:
-		size_t _index;
-		msgpack::object* _pobj;
-	};
-
 	class IKVObject
 	{
 		typedef IKVObject MySelf;
@@ -327,7 +284,7 @@ namespace MsgpackWrapper {
 			return *this;
 		}
 
-		IObject ObjectKey()
+		IObject KeyObject()
 		{
 			if (!_pobj)
 				throw msgpack::type_error();
@@ -335,7 +292,7 @@ namespace MsgpackWrapper {
 			return IObject(&_pobj->key);
 		}
 
-		IObject ObjectVal()
+		IObject ValObject()
 		{
 			if (!_pobj)
 				throw msgpack::type_error();
@@ -345,43 +302,6 @@ namespace MsgpackWrapper {
 
 	protected:
 		msgpack::object_kv* _pobj;
-	};
-
-	class IMapObject
-	{
-		typedef IObject		Base;
-		typedef IMapObject	MySelf;
-
-	public:
-		IMapObject(const IObject& b) : _pobj(b._pobj), _index(0) {}
-
-		IMapObject(const IMapObject& o) : _pobj(o._pobj), _index(o._index) {}
-
-		IMapObject& operator=(const IMapObject& o)
-		{
-			_pobj = o._pobj;
-			_index = o._index;
-			return *this;
-		}
-
-		IKVObject Object()
-		{
-			if (!_pobj)
-				throw msgpack::type_error();
-
-			if (_index >= _pobj->via.map.size)
-			{
-				return IKVObject(0);
-			}
-			else
-			{
-				return IKVObject(_pobj->via.map.ptr + _index++);
-			}
-		}
-
-	protected:
-		size_t _index;
-		msgpack::object* _pobj;
 	};
 
 	//////////////////////////////////////////////////////////////////////////反序列化相关类////////////////////////////////////////////////////////
@@ -403,6 +323,13 @@ namespace MsgpackWrapper {
 		IObject Object()
 		{
 			return IObject(&_unpaked.get());
+		}
+
+		template<typename T>
+		IMsgPackObject& ReadObject(T& v)
+		{
+			Object().Read(v);
+			return *this;
 		}
 
 	protected:
@@ -443,6 +370,13 @@ namespace MsgpackWrapper {
 			}
 		}
 
+		template<typename T>
+		IMsgPackArrayObject& ReadObject(T& v)
+		{
+			Object().Read(v);
+			return *this;
+		}
+
 	protected:
 		size_t _index;
 	};
@@ -465,6 +399,7 @@ namespace MsgpackWrapper {
 			return _unpaked.get().via.map.size;
 		}
 
+		// 顺序迭代
 		IKVObject Object()
 		{
 			if (_index >= _unpaked.get().via.map.size)
@@ -475,6 +410,55 @@ namespace MsgpackWrapper {
 			{
 				return IKVObject(_unpaked.get().via.map.ptr + _index++);
 			}
+		}
+
+		// key值索引,速度会慢,但是安全
+		template<typename T>
+		IKVObject Object(const T& key)
+		{
+			for (size_t idx=0; idx<_unpaked.get().via.map.size; ++idx)
+			{
+				msgpack::object_kv* pkv = _unpaked.get().via.map.ptr + idx;
+				try { 
+					if (pkv->key.as<T>() == key)
+						return IKVObject(_unpaked.get().via.map.ptr + idx++);
+				}catch(...){}
+			}
+			return IKVObject(0);
+		}
+
+		// key值索引,速度会有问题,但是安全
+		template<int N>
+		IKVObject Object(const char(&k)[N])
+		{
+			return Object(std::string(k));
+		}
+
+		// key值是非加const的
+		template<typename T1, typename T2>
+		IMsgPackMapObject& ReadObject(T1& k,T2& v)
+		{
+			IKVObject obj = Object();
+			obj.KeyObject().Read(k);
+			obj.ValObject().Read(v);
+			return *this;
+		}
+
+		// key值是加const的
+		template<typename T1, typename T2>
+		IMsgPackMapObject& ReadObject(const T1& k, T2& v)
+		{
+			IKVObject obj = Object(k);
+			obj.ValObject().Read(v);
+			return *this;
+		}
+
+		template<typename T, int N>
+		IMsgPackMapObject& ReadObject(const char(&k)[N],T& v)
+		{
+			IKVObject obj = Object(k);
+			obj.ValObject().Read(v);
+			return *this;
 		}
 
 	protected:
